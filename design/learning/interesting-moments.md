@@ -1,0 +1,7 @@
+[@response.60ad0820](../../context/design/concepts/CustomerFeedback/testing.md/steps/response.60ad0820.md)
+
+# Deliverable: Interesting Moments
+
+While I was thinking about implementation of ordering system, I noticed a complication of item option. For each menu item, there needs to corresponding options available--for example, a latte item should have milk options to choose between whole and oat, temperature options to choose between hot and iced. However, an americano item should not have milk options. But, when customers are ordering, we need to be able to handle choices that they make on each option. This nested relationship made me refactor the "option" and "choice" states so that they can represent the complex, nested relationships without affecting each other. 
+
+I was surprised on how fast the Google Gemini's inference was. Maybe it's because there is no middle layer application like Cursor or Copilot that runs the loop--it felt much faster than using the coding agent. One thing that wasn't working well with the context tool was like shown in the first context link (@response.60ad0820), the Gemini often failed to use h1 markdown correctly such as ```# file: ```. Perhaps the context was too long. 

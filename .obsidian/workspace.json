@@ -4,21 +4,21 @@
     "type": "split",
     "children": [
       {
-        "id": "0191866cebf1b7c3",
+        "id": "7193dc290bec0593",
         "type": "tabs",
         "children": [
           {
-            "id": "60ccb8b74e272dda",
+            "id": "00fb1af7c018ba92",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "README.md",
+                "file": "design/concepts/LikertSurvey/implementation.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "README"
+              "title": "implementation"
             }
           }
         ]
@@ -142,21 +142,21 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "README.md",
+                "file": "design/concepts/LikertSurvey/implementation.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of README"
+              "title": "Outline of implementation"
             }
           }
-        ]
+        ],
+        "currentTab": 3
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 300
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -169,8 +169,46 @@
       "bases:Create new base": false
     }
   },
-  "active": "60ccb8b74e272dda",
+  "active": "00fb1af7c018ba92",
   "lastOpenFiles": [
-    "README.md"
+    "context/design/concepts/TestConcept/implementation.md/steps/implement.0e9f0d0b.md",
+    "context/design/concepts/TestConcept/implementation.md/steps/file.f007798c.md",
+    "context/design/concepts/TestConcept/implementation.md/steps/approach.5df2171f.md",
+    "context/design/concepts/TestConcept/implementation.md/steps/_.fa3ad648.md",
+    "context/design/concepts/TestConcept/implementation.md/steps/_.ee4d1e5e.md",
+    "context/design/concepts/TestConcept/implementation.md/steps/_.db39d951.md",
+    "context/design/concepts/TestConcept/implementation.md/steps/_.5da05fda.md",
+    "context/design/concepts/TestConcept/implementation.md/steps/_.534e93ad.md",
+    "context/design/concepts/TestConcept/implementation.md/steps/_.3eb68380.md",
+    "context/design/concepts/TestConcept/implementation.md/steps/_.3a59af90.md",
+    "context/design/concepts/TestConcept/implementation.md/steps/_.331f5a1f.md",
+    "context/design/concepts/TestConcept/implementation.md/steps/_.2086d81d.md",
+    "context/design/concepts/TestConcept/implementation.md/steps/_.1bf7fdfc.md",
+    "context/design/concepts/TestConcept/implementation.md/steps/Generic Parameters.087161ea.md",
+    "context/design/concepts/TestConcept/implementation.md/steps",
+    "context/design/concepts/TestConcept/implementation.md/20251016_130919.7a1d39cb.md",
+    "context/design/concepts/TestConcept/implementation.md",
+    "context/design/concepts/TestConcept",
+    "context/Users/terrykim/Desktop/mit/6.1040/latteapp/design/concepts/TestConcept/implementation.md/20251016_130231.2fa825f1.md",
+    "context/Users/terrykim/Desktop/mit/6.1040/latteapp/design/concepts/TestConcept/implementation.md/steps/file.27a41a43.md",
+    "context/Users/terrykim/Desktop/mit/6.1040/latteapp/design/concepts/TestConcept/implementation.md/steps/concept.7a94913f.md",
+    "context/Users/terrykim/Desktop/mit/6.1040/latteapp/design/concepts/TestConcept/implementation.md/steps/response.6d76b65d.md",
+    "context/Users/terrykim/Desktop/mit/6.1040/latteapp/design/concepts/TestConcept/implementation.md/20251016_130156.7a1d39cb.md",
+    "context/Users/terrykim/Desktop/mit/6.1040/latteapp/design/concepts/TestConcept/implementation.md/steps/implement.0e9f0d0b.md",
+    "context/Users/terrykim/Desktop/mit/6.1040/latteapp/design/concepts/TestConcept/implementation.md/steps/_.1bf7fdfc.md",
+    "context/Users/terrykim/Desktop/mit/6.1040/latteapp/design/concepts/TestConcept/implementation.md/steps/_.2086d81d.md",
+    "context/Users/terrykim/Desktop/mit/6.1040/latteapp/design/concepts/TestConcept/implementation.md/steps/_.db39d951.md",
+    "context/Users/terrykim/Desktop/mit/6.1040/latteapp/design/concepts/TestConcept/implementation.md/steps/_.331f5a1f.md",
+    "context/Users/terrykim/Desktop/mit/6.1040/latteapp/design/concepts/TestConcept/implementation.md/steps",
+    "context/Users/terrykim/Desktop/mit/6.1040/latteapp/design/concepts/TestConcept",
+    "context/Users/terrykim/Desktop/mit/6.1040/latteapp/design/concepts",
+    "design/concepts/TestConcept",
+    "context/Users/terrykim/Desktop/mit/6.1040/latteapp/design/brainstorming/questioning copy.md/steps",
+    "context/Users/terrykim/Desktop/mit/6.1040/latteapp/design/brainstorming",
+    "context/Users/terrykim/Desktop/mit/6.1040/latteapp/design",
+    "context/Users/terrykim/Desktop/mit/6.1040/latteapp",
+    "media/linking.png",
+    "media/obsidian_settings.png",
+    "media/relative_linking.png"
   ]
 }

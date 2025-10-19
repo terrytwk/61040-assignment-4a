@@ -1,0 +1,183 @@
+# Concept Design from Assignment 2
+### 🧩 1. UserAuth
+
+Purpose:
+Authenticate users so that only verified members can place orders.
+
+Principle:
+If a user registers with a username and password, then logs in using the same credentials, they are authenticated as that user.
+
+State:
+```
+a set of Users with
+  a username String
+  a password String
+```
+
+Actions:
+
+register(username, password)
+
+login(username, password)
+
+logout(user)
+
+### 🧩 2. Membership [User]
+
+Purpose:
+Track user membership status and privileges.
+
+Principle:
+If a user signs up for membership, they gain access to member-only actions (like ordering).
+
+State:
+```
+a set of Users with
+  a joinDate Date
+  a semester String // F25, S25
+  a price Number
+  an active Boolean
+```
+
+Actions:
+
+createMembership(user)
+
+toggleActive(user, active)
+
+### 🧩 3. Menu [Option]
+
+Purpose:
+Define the items available to order at the café.
+
+Principle:
+If an admin adds an item to the menu, it becomes visible to members when ordering.
+
+State:
+```
+a set of Items with
+  a name String
+  a description String
+  a set of Options
+  a available Boolean
+```
+
+Actions:
+
+addItem(name, description, option, available)
+
+removeItem(item)
+
+toggleAvailability(item, available)
+
+### 🧩 4. Order [User, Item]
+
+Purpose:
+Let members place and view orders.
+
+Principle:
+If a member selects menu items and places an order, the system records it and marks it as completed once prepared.
+
+State:
+```
+a set of Orders with
+  a user User
+  a items set of Item
+  a status String  // "pending", "ready", "completed"
+  a createdAt Date
+```
+
+Actions:
+
+createOrder(user, items)
+
+updateStatus(order, status)
+
+cancelOrder(order)
+
+Sync Example:
+
+sync AllowOrder
+when Request.createOrder(user, items)
+where in Membership: active(user) is true
+then Order.createOrder(user, items)
+
+### 🧩 5. CustomerFeedback [User, Order]
+
+Purpose:
+Let members provide feedback after an order is completed.
+
+Principle:
+After completing an order, a member can rate or comment on it for quality tracking.
+
+State:
+```
+a set of Feedback with
+  a user User
+  an order Order
+  a comment String
+  a createdAt Date
+  a public Boolean
+```
+
+Actions:
+
+submitFeedback(user, order, rating, comment)
+
+_getFeedbackByOrder(order)
+
+Sync Example:
+
+sync FeedbackEligibility
+when Order.updateStatus(order, "completed")
+where in Membership: active(user(order)) is true
+then allow CustomerFeedback.submitFeedback(user(order), order)
+
+### 🧩 6. UserProfile [User]
+
+Purpose:
+Store and update each user’s public info separate from authentication.
+
+Principle:
+If a user edits their profile, their display name and preferences update across the app.
+
+State:
+```
+a set of Users with
+  a name String
+  a favoriteDrink String
+  a bio String
+  a classYear Number
+  a major String
+  a type String // customer, barista
+  a score Number
+```
+
+Actions:
+
+updateProfile(user, displayName, favoriteDrink, bio)
+
+_getProfile(user)
+
+### 🧩 7. Option
+
+Purpose:
+[Todo]
+
+Principle:
+[Todo]
+
+State:
+```
+a set of Option with
+  a key String
+  a set of values String
+```
+
+Actions:
+
+addOption(name, description, option, available)
+
+removeItem(item)
+
+toggleAvailability(item, available)
