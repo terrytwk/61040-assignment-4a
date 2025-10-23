@@ -1,13 +1,16 @@
-[@implemenation](../CustomerFeedback/implemenation.md)
+---
+timestamp: 'Mon Oct 20 2025 09:35:45 GMT-0400 (Eastern Daylight Time)'
+parent: '[[../20251020_093545.4de4ff1b.md]]'
+content_id: 3101035480ad190c0974ecd0e0efffa17658b3c4e633f157431dffef705ce394
+---
 
-# implement: CustomerFeedback
 # response:
 
 ```typescript
 // file: src/concepts/CustomerFeedback/CustomerFeedbackConcept.ts
 
-import { Collection, Db } from "npm:mongodb"; 
-import { Empty, ID } from "@utils/types.ts";
+import { Collection, Db } from "npm:mongodb"; // Removed ObjectId as it's not directly used for concept IDs.
+import { ID } from "@utils/types.ts";
 import { freshID } from "@utils/database.ts";
 
 // Declare collection prefix, use concept name
@@ -19,6 +22,13 @@ type Order = ID;
 type Feedback = ID; // The unique identifier for a feedback record itself
 
 /**
+ * Concept: CustomerFeedback
+ *
+ * purpose: Collect user comments about completed orders for quality tracking and improvement.
+ *
+ * principle: After an order is **completed**, the user (or barista on behalf of the user) can
+ * record a feedback comment linked to that order; feedback for non-completed or canceled orders is rejected.
+ *
  * Interface representing the state of a single feedback record.
  * Corresponds to:
  * a set of Feedbacks with
@@ -35,15 +45,12 @@ interface FeedbackRecord {
   createdAt: Date; // Using Date object to represent Time
 }
 
-/**
- * @concept CustomerFeedback
- * @purpose Collect user comments about completed orders for quality tracking and improvement.
- * @principle After an order is **completed**, the user (or barista on behalf of the user) can record a feedback comment linked to that order; feedback for non-completed or canceled orders is rejected.
- */
 export default class CustomerFeedbackConcept {
+  // MongoDB Collection for Feedbacks
   private feedbacks: Collection<FeedbackRecord>;
 
   constructor(private readonly db: Db) {
+    // Initialize the MongoDB collection for feedback records
     this.feedbacks = this.db.collection(PREFIX + "feedbacks");
   }
 
@@ -65,10 +72,13 @@ export default class CustomerFeedbackConcept {
   }): Promise<{ feedbackId: Feedback } | { error: string }> {
     try {
       // The concept's 'requires true' indicates that external logic (syncs) will
-      // enforce business rules like order completion. This action focuses purely on creation.
+      // enforce business rules like order completion. This action focuses purely on creating
+      // the feedback record if called.
 
+      // Generate a fresh ID for the new feedback record
       const feedbackId = freshID();
-      const createdAt = new Date(); // Record current time
+      // Record the current time for creation
+      const createdAt = new Date();
 
       const newFeedback: FeedbackRecord = {
         _id: feedbackId,
@@ -78,10 +88,13 @@ export default class CustomerFeedbackConcept {
         createdAt,
       };
 
+      // Insert the new feedback record into the collection
       await this.feedbacks.insertOne(newFeedback);
 
+      // Return the ID of the newly created feedback in a dictionary
       return { feedbackId };
     } catch (e) {
+      // Log and return an error message if insertion fails
       console.error(
         `CustomerFeedback.create: Error creating feedback: ${e.message}`
       );
@@ -105,20 +118,22 @@ export default class CustomerFeedbackConcept {
   > {
     try {
       // Find all feedback records associated with the given order ID
+      // Project to return only specified fields: user, comment, createdAt (excluding _id)
       const results = await this.feedbacks
         .find(
           { order },
           { projection: { _id: 0, user: 1, comment: 1, createdAt: 1 } }
-        ) // Project to return only specified fields, excluding _id
+        )
         .toArray();
 
-      // Map results to match the specified output structure
+      // Map the results to match the specified output structure for the query
       return results.map((f) => ({
         user: f.user,
         comment: f.comment,
         createdAt: f.createdAt,
       }));
     } catch (e) {
+      // Log and return an error message if the query fails
       console.error(
         `CustomerFeedback._forOrder: Error querying feedback for order ${order}: ${e.message}`
       );
@@ -144,20 +159,22 @@ export default class CustomerFeedbackConcept {
   > {
     try {
       // Find all feedback records associated with the given user ID
+      // Project to return only specified fields: order, comment, createdAt (excluding _id)
       const results = await this.feedbacks
         .find(
           { user },
           { projection: { _id: 0, order: 1, comment: 1, createdAt: 1 } }
-        ) // Project to return only specified fields, excluding _id
+        )
         .toArray();
 
-      // Map results to match the specified output structure
+      // Map the results to match the specified output structure for the query
       return results.map((f) => ({
         order: f.order,
         comment: f.comment,
         createdAt: f.createdAt,
       }));
     } catch (e) {
+      // Log and return an error message if the query fails
       console.error(
         `CustomerFeedback._forUser: Error querying feedback for user ${user}: ${e.message}`
       );

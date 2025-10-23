@@ -1,12 +1,15 @@
-[@implemenation](../CustomerFeedback/implemenation.md)
+---
+timestamp: 'Mon Oct 20 2025 09:35:16 GMT-0400 (Eastern Daylight Time)'
+parent: '[[../20251020_093516.2c0970fc.md]]'
+content_id: 60ad08206cd0d62454b4ea29a482e38e56de48e3e5502d11735dcedc6b063f5a
+---
 
-# implement: CustomerFeedback
 # response:
 
 ```typescript
 // file: src/concepts/CustomerFeedback/CustomerFeedbackConcept.ts
 
-import { Collection, Db } from "npm:mongodb"; 
+import { Collection, Db, ObjectId } from "npm:mongodb"; // ObjectId imported for consistency with example, though not directly used for concept IDs.
 import { Empty, ID } from "@utils/types.ts";
 import { freshID } from "@utils/database.ts";
 
@@ -35,11 +38,6 @@ interface FeedbackRecord {
   createdAt: Date; // Using Date object to represent Time
 }
 
-/**
- * @concept CustomerFeedback
- * @purpose Collect user comments about completed orders for quality tracking and improvement.
- * @principle After an order is **completed**, the user (or barista on behalf of the user) can record a feedback comment linked to that order; feedback for non-completed or canceled orders is rejected.
- */
 export default class CustomerFeedbackConcept {
   private feedbacks: Collection<FeedbackRecord>;
 

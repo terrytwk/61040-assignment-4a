@@ -88,7 +88,9 @@ export default class MenuConcept {
    *
    * **effects** creates active item
    */
-  async createItem({ name, description }: { name: string; description: string }): Promise<{ item: Item }> {
+  async createItem(
+    { name, description }: { name: string; description: string },
+  ): Promise<{ item: Item }> {
     const newItemId = freshID();
     const newItem: ItemDoc = {
       _id: newItemId,
@@ -107,7 +109,9 @@ export default class MenuConcept {
    *
    * **effects** sets isActive
    */
-  async setItemActive({ item, isActive }: { item: Item; isActive: boolean }): Promise<Empty | { error: string }> {
+  async setItemActive(
+    { item, isActive }: { item: Item; isActive: boolean },
+  ): Promise<Empty | { error: string }> {
     const res = await this.items.updateOne(
       { _id: item },
       { $set: { isActive: isActive } },
@@ -151,7 +155,9 @@ export default class MenuConcept {
    *
    * **effects** creates active choice under option
    */
-  async createChoice({ option, name }: { option: Option; name: string }): Promise<{ choice: Choice } | { error: string }> {
+  async createChoice(
+    { option, name }: { option: Option; name: string },
+  ): Promise<{ choice: Choice } | { error: string }> {
     const optionExists = await this.options.findOne({ _id: option });
     if (!optionExists) {
       return { error: `Option with ID ${option} not found.` };
@@ -175,13 +181,18 @@ export default class MenuConcept {
    *
    * **effects** adds Applicability(item, option) with empty disallowedChoices
    */
-  async attachOption({ item, option }: { item: Item; option: Option }): Promise<Empty | { error: string }> {
+  async attachOption(
+    { item, option }: { item: Item; option: Option },
+  ): Promise<Empty | { error: string }> {
     const itemExists = await this.items.findOne({ _id: item });
     if (!itemExists) return { error: `Item with ID ${item} not found.` };
     const optionExists = await this.options.findOne({ _id: option });
     if (!optionExists) return { error: `Option with ID ${option} not found.` };
 
-    const existingApplicability = await this.applicabilities.findOne({ item, option });
+    const existingApplicability = await this.applicabilities.findOne({
+      item,
+      option,
+    });
     if (existingApplicability) {
       return { error: `Option ${option} is already attached to item ${item}.` };
     }
@@ -204,10 +215,14 @@ export default class MenuConcept {
    *
    * **effects** removes it
    */
-  async detachOption({ item, option }: { item: Item; option: Option }): Promise<Empty | { error: string }> {
+  async detachOption(
+    { item, option }: { item: Item; option: Option },
+  ): Promise<Empty | { error: string }> {
     const res = await this.applicabilities.deleteOne({ item, option });
     if (res.deletedCount === 0) {
-      return { error: `Applicability for item ${item} and option ${option} not found.` };
+      return {
+        error: `Applicability for item ${item} and option ${option} not found.`,
+      };
     }
     return {};
   }
@@ -219,13 +234,20 @@ export default class MenuConcept {
    *
    * **effects** adds choice to disallowedChoices
    */
-  async disallowChoice({ item, option, choice }: { item: Item; option: Option; choice: Choice }): Promise<Empty | { error: string }> {
+  async disallowChoice(
+    { item, option, choice }: { item: Item; option: Option; choice: Choice },
+  ): Promise<Empty | { error: string }> {
     const applicability = await this.applicabilities.findOne({ item, option });
     if (!applicability) {
-      return { error: `Applicability for item ${item} and option ${option} not found.` };
+      return {
+        error: `Applicability for item ${item} and option ${option} not found.`,
+      };
     }
 
-    const choiceDoc = await this.choices.findOne({ _id: choice, option: option });
+    const choiceDoc = await this.choices.findOne({
+      _id: choice,
+      option: option,
+    });
     if (!choiceDoc) {
       return { error: `Choice ${choice} does not belong to option ${option}.` };
     }
@@ -250,10 +272,14 @@ export default class MenuConcept {
    *
    * **effects** removes from disallowedChoices
    */
-  async allowChoice({ item, option, choice }: { item: Item; option: Option; choice: Choice }): Promise<Empty | { error: string }> {
+  async allowChoice(
+    { item, option, choice }: { item: Item; option: Option; choice: Choice },
+  ): Promise<Empty | { error: string }> {
     const applicability = await this.applicabilities.findOne({ item, option });
     if (!applicability) {
-      return { error: `Applicability for item ${item} and option ${option} not found.` };
+      return {
+        error: `Applicability for item ${item} and option ${option} not found.`,
+      };
     }
 
     // Check if choice is actually disallowed
@@ -270,26 +296,41 @@ export default class MenuConcept {
   }
 
   /**
-   * _optionsForItem (item: Item) : (option: {id: Option, required: Boolean, maxChoices: Number})
+   * _optionsForItem (item: Item) : (option: {id: Option, name: String, required: Boolean, maxChoices: Number})
    *
    * **requires** item exists
    *
    * **effects** returns attached options
    */
-  async _optionsForItem({ item }: { item: Item }): Promise<{ option: { id: Option; required: boolean; maxChoices: number } }[] | { error: string }> {
+  async _optionsForItem(
+    { item }: { item: Item },
+  ): Promise<
+    {
+      option: {
+        id: Option;
+        name: string;
+        required: boolean;
+        maxChoices: number;
+      };
+    }[] | {
+      error: string;
+    }
+  > {
     const itemExists = await this.items.findOne({ _id: item });
     if (!itemExists) {
       return { error: `Item with ID ${item} not found.` };
     }
 
     const applicabilities = await this.applicabilities.find({ item }).toArray();
-    const optionIds = applicabilities.map(app => app.option);
+    const optionIds = applicabilities.map((app) => app.option);
 
-    const options = await this.options.find({ _id: { $in: optionIds } }).toArray();
+    const options = await this.options.find({ _id: { $in: optionIds } })
+      .toArray();
 
-    return options.map(opt => ({
+    return options.map((opt) => ({
       option: {
         id: opt._id,
+        name: opt.name,
         required: opt.required,
         maxChoices: opt.maxChoices,
       },
@@ -303,10 +344,14 @@ export default class MenuConcept {
    *
    * **effects** returns active choices excluding disallowedChoices
    */
-  async _choicesFor({ item, option }: { item: Item; option: Option }): Promise<{ choice: { id: Choice; name: string } }[] | { error: string }> {
+  async _choicesFor(
+    { item, option }: { item: Item; option: Option },
+  ): Promise<{ choice: { id: Choice; name: string } }[] | { error: string }> {
     const applicability = await this.applicabilities.findOne({ item, option });
     if (!applicability) {
-      return { error: `Applicability for item ${item} and option ${option} not found.` };
+      return {
+        error: `Applicability for item ${item} and option ${option} not found.`,
+      };
     }
 
     const disallowedChoices = applicability.disallowedChoices;
@@ -317,10 +362,30 @@ export default class MenuConcept {
       _id: { $nin: disallowedChoices },
     }).toArray();
 
-    return choices.map(ch => ({
+    return choices.map((ch) => ({
       choice: {
         id: ch._id,
         name: ch.name,
+      },
+    }));
+  }
+
+  /**
+   * _allActiveItems () : (item: {id: Item, name: String, description: String})
+   *
+   * **requires** true
+   *
+   * **effects** returns all active menu items
+   */
+  async _allActiveItems(): Promise<
+    { item: { id: Item; name: string; description: string } }[]
+  > {
+    const items = await this.items.find({ isActive: true }).toArray();
+    return items.map((item) => ({
+      item: {
+        id: item._id,
+        name: item.name,
+        description: item.description,
       },
     }));
   }
@@ -342,15 +407,20 @@ export default class MenuConcept {
       return { error: `Item with ID ${item} not found.` };
     }
 
-    const attachedApplicabilities = await this.applicabilities.find({ item }).toArray();
-    const attachedOptionIds = new Set(attachedApplicabilities.map(app => app.option));
+    const attachedApplicabilities = await this.applicabilities.find({ item })
+      .toArray();
+    const attachedOptionIds = new Set(
+      attachedApplicabilities.map((app) => app.option),
+    );
 
     // Fetch all relevant options and choices for validation
-    const allOptionIdsInvolved = Array.from(new Set([
-      ...attachedOptionIds,
-      ...selections.map(s => s.option),
-    ]));
-    const allChoiceIdsInvolved = selections.map(s => s.choice);
+    const allOptionIdsInvolved = Array.from(
+      new Set([
+        ...attachedOptionIds,
+        ...selections.map((s) => s.option),
+      ]),
+    );
+    const allChoiceIdsInvolved = selections.map((s) => s.choice);
 
     const [
       involvedOptions,
@@ -360,9 +430,15 @@ export default class MenuConcept {
       this.choices.find({ _id: { $in: allChoiceIdsInvolved } }).toArray(),
     ]);
 
-    const optionMap = new Map<Option, OptionDoc>(involvedOptions.map(o => [o._id, o]));
-    const choiceMap = new Map<Choice, ChoiceDoc>(involvedChoices.map(c => [c._id, c]));
-    const applicabilityMap = new Map<Option, ApplicabilityDoc>(attachedApplicabilities.map(app => [app.option, app]));
+    const optionMap = new Map<Option, OptionDoc>(
+      involvedOptions.map((o) => [o._id, o]),
+    );
+    const choiceMap = new Map<Choice, ChoiceDoc>(
+      involvedChoices.map((c) => [c._id, c]),
+    );
+    const applicabilityMap = new Map<Option, ApplicabilityDoc>(
+      attachedApplicabilities.map((app) => [app.option, app]),
+    );
 
     // Group selections by option to easily count choices per option
     const selectionsByOption = new Map<Option, Choice[]>();
@@ -380,13 +456,19 @@ export default class MenuConcept {
 
       // Check if selected option is attached to item
       if (!attachedOptionIds.has(option)) {
-        return [{ ok: false, reason: `Option ${option} is not attached to item ${item}.` }];
+        return [{
+          ok: false,
+          reason: `Option ${option} is not attached to item ${item}.`,
+        }];
       }
 
       // Check if choice belongs to its option, is active, and is not disallowed
       const choiceDoc = choiceMap.get(choice);
       if (!choiceDoc || choiceDoc.option !== option) {
-        return [{ ok: false, reason: `Choice ${choice} does not belong to option ${option}.` }];
+        return [{
+          ok: false,
+          reason: `Choice ${choice} does not belong to option ${option}.`,
+        }];
       }
       if (!choiceDoc.isActive) {
         return [{ ok: false, reason: `Choice ${choice} is not active.` }];
@@ -394,15 +476,25 @@ export default class MenuConcept {
 
       const applicability = applicabilityMap.get(option);
       if (applicability && applicability.disallowedChoices.includes(choice)) {
-        return [{ ok: false, reason: `Choice ${choice} is disallowed for option ${option} on item ${item}.` }];
+        return [{
+          ok: false,
+          reason:
+            `Choice ${choice} is disallowed for option ${option} on item ${item}.`,
+        }];
       }
     }
 
     // 2. Check all attached required options are present
     for (const applicability of attachedApplicabilities) {
       const optionDoc = optionMap.get(applicability.option);
-      if (optionDoc?.required && !selectionsByOption.has(applicability.option)) {
-        return [{ ok: false, reason: `Required option ${applicability.option} is missing for item ${item}.` }];
+      if (
+        optionDoc?.required && !selectionsByOption.has(applicability.option)
+      ) {
+        return [{
+          ok: false,
+          reason:
+            `Required option ${applicability.option} is missing for item ${item}.`,
+        }];
       }
     }
 
@@ -410,7 +502,11 @@ export default class MenuConcept {
     for (const [option, selectedChoices] of selectionsByOption.entries()) {
       const optionDoc = optionMap.get(option);
       if (optionDoc && selectedChoices.length > optionDoc.maxChoices) {
-        return [{ ok: false, reason: `Option ${option} exceeds its maximum allowed choices (${optionDoc.maxChoices}).` }];
+        return [{
+          ok: false,
+          reason:
+            `Option ${option} exceeds its maximum allowed choices (${optionDoc.maxChoices}).`,
+        }];
       }
     }
 

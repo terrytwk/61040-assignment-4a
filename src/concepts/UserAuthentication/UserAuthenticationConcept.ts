@@ -1,4 +1,3 @@
-
 import { Collection, Db } from "npm:mongodb";
 import { Empty, ID } from "@utils/types.ts";
 import { freshID } from "@utils/database.ts";
@@ -147,21 +146,60 @@ export default class UserAuthenticationConcept {
   }
 
   /**
-   * _byUsername (username: String) : (user: User)
+   * _searchByKerb (kerbQuery: String) : (user: User, username: String)[]
    *
    * **requires** true
    *
-   * **effects** returns user if present
+   * **effects** returns users whose usernames contain the query string (case-insensitive)
    */
-  async _byUsername({
-    username,
+  async _searchByKerb({
+    kerbQuery,
   }: {
-    username: string;
-  }): Promise<{ user: User }[]> {
-    const userDoc = await this.users.findOne({ username });
-    if (userDoc) {
-      return [{ user: userDoc._id }];
+    kerbQuery: string;
+  }): Promise<{ user: User; username: string }[]> {
+    // Create case-insensitive regex for partial matching
+    const regex = new RegExp(kerbQuery, "i");
+
+    const userDocs = await this.users.find({
+      username: { $regex: regex },
+    }).toArray();
+
+    return userDocs.map((doc) => ({
+      user: doc._id,
+      username: doc.username,
+    }));
+  }
+
+  /**
+   * _findByKerb (kerbQuery: String) : (user: User, username: String) | { error: String }
+   *
+   * **requires** true
+   *
+   * **effects** returns exactly one user whose username matches the query (case-insensitive), or error if not found or multiple matches
+   */
+  async _findByKerb({
+    kerbQuery,
+  }: {
+    kerbQuery: string;
+  }): Promise<{ user: User; username: string } | { error: string }> {
+    // Create case-insensitive regex for exact matching
+    const regex = new RegExp(`^${kerbQuery}$`, "i");
+
+    const userDocs = await this.users.find({
+      username: { $regex: regex },
+    }).toArray();
+
+    if (userDocs.length === 0) {
+      return { error: "No user found" };
     }
-    return []; // Return empty array if not found
+
+    if (userDocs.length > 1) {
+      return { error: "Multiple users found" };
+    }
+
+    return {
+      user: userDocs[0]._id,
+      username: userDocs[0].username,
+    };
   }
 }

@@ -118,7 +118,9 @@ export default class OrderConcept {
    *
    * **effects** creates order with status := pending, createdAt := now; returns the new order's ID
    */
-  async open({ user }: { user: User }): Promise<{ order: Order } | { error: string }> {
+  async open(
+    { user }: { user: User },
+  ): Promise<{ order: Order } | { error: string }> {
     const newOrderId = freshID();
     const newOrder: OrderDocument = {
       _id: newOrderId,
@@ -171,7 +173,8 @@ export default class OrderConcept {
     }
     if (existingOrder.status !== "pending") {
       return {
-        error: `Cannot add items to an order with status '${existingOrder.status}'. Only 'pending' orders can be modified.`,
+        error:
+          `Cannot add items to an order with status '${existingOrder.status}'. Only 'pending' orders can be modified.`,
       };
     }
 
@@ -184,7 +187,9 @@ export default class OrderConcept {
       displayItemName: displayItemName,
     };
 
-    const newSelectedChoices: SelectedChoiceDocument[] = selections.map((s) => ({
+    const newSelectedChoices: SelectedChoiceDocument[] = selections.map((
+      s,
+    ) => ({
       _id: freshID(),
       line: newLineId,
       option: s.option,
@@ -219,7 +224,9 @@ export default class OrderConcept {
    * step in the order lifecycle. It does not modify the order's `status` field directly. Syncs are expected
    * to use this action's successful execution as a trigger for subsequent logic (e.g., preventing further `addItem`).
    */
-  async submit({ order }: { order: Order }): Promise<Empty | { error: string }> {
+  async submit(
+    { order }: { order: Order },
+  ): Promise<Empty | { error: string }> {
     const existingOrder = await this.orders.findOne({ _id: order });
     if (!existingOrder) {
       return { error: `Order with ID ${order} not found.` };
@@ -228,7 +235,8 @@ export default class OrderConcept {
     // This action only checks if the order exists and is pending.
     if (existingOrder.status !== "pending") {
       return {
-        error: `Order with ID ${order} is already '${existingOrder.status}' and cannot be submitted.`,
+        error:
+          `Order with ID ${order} is already '${existingOrder.status}' and cannot be submitted.`,
       };
     }
     // No state change (status remains 'pending' from this concept's perspective)
@@ -242,7 +250,9 @@ export default class OrderConcept {
    *
    * **effects** sets status := completed
    */
-  async complete({ order }: { order: Order }): Promise<Empty | { error: string }> {
+  async complete(
+    { order }: { order: Order },
+  ): Promise<Empty | { error: string }> {
     const result = await this.orders.updateOne(
       { _id: order, status: "pending" },
       { $set: { status: "completed" } },
@@ -254,7 +264,8 @@ export default class OrderConcept {
         return { error: `Order with ID ${order} not found.` };
       }
       return {
-        error: `Order with ID ${order} is already '${existingOrder.status}' and cannot be completed.`,
+        error:
+          `Order with ID ${order} is already '${existingOrder.status}' and cannot be completed.`,
       };
     }
 
@@ -268,7 +279,9 @@ export default class OrderConcept {
    *
    * **effects** sets status := canceled
    */
-  async cancel({ order }: { order: Order }): Promise<Empty | { error: string }> {
+  async cancel(
+    { order }: { order: Order },
+  ): Promise<Empty | { error: string }> {
     const result = await this.orders.updateOne(
       { _id: order, status: "pending" },
       { $set: { status: "canceled" } },
@@ -280,7 +293,8 @@ export default class OrderConcept {
         return { error: `Order with ID ${order} not found.` };
       }
       return {
-        error: `Order with ID ${order} is already '${existingOrder.status}' and cannot be canceled.`,
+        error:
+          `Order with ID ${order} is already '${existingOrder.status}' and cannot be canceled.`,
       };
     }
 
@@ -306,7 +320,8 @@ export default class OrderConcept {
     const results: { line: OrderLineOutput }[] = [];
 
     for (const line of lines) {
-      const selections = await this.selectedChoices.find({ line: line._id }).toArray();
+      const selections = await this.selectedChoices.find({ line: line._id })
+        .toArray();
       results.push({
         line: {
           id: line._id,
@@ -327,20 +342,62 @@ export default class OrderConcept {
   }
 
   /**
-   * _status (order: Order) : (status: String | error: String)
+   * _byStatus (status: String) : (order: Order, user: User, createdAt: Time, lines: {id: OrderLine, item: Item, qty: Number, selections: {option: Option, choice: Choice}[]})[]
    *
-   * **requires** order exists
+   * **requires** true
    *
-   * **effects** returns current status of the order
+   * **effects** returns all orders with the specified status, ordered by creation time (newest first), including order lines and selections
    */
-  async _status(
-    { order }: { order: Order },
-  ): Promise<{ status: OrderStatus }[] | { error: string }> {
-    const existingOrder = await this.orders.findOne({ _id: order });
-    if (!existingOrder) {
-      return { error: `Order with ID ${order} not found.` };
+  async _byStatus({
+    status,
+  }: {
+    status: OrderStatus;
+  }): Promise<{
+    order: Order;
+    user: User;
+    createdAt: Date;
+    lines: OrderLineOutput[];
+  }[]> {
+    const orders = await this.orders
+      .find({ status })
+      .sort({ createdAt: -1 }) // Newest first
+      .toArray();
+
+    const results = [];
+
+    for (const order of orders) {
+      // Get order lines for this order
+      const lines = await this.orderLines.find({ order: order._id }).toArray();
+
+      const orderLines: OrderLineOutput[] = [];
+
+      for (const line of lines) {
+        // Get selections for this line
+        const selections = await this.selectedChoices.find({ line: line._id })
+          .toArray();
+
+        orderLines.push({
+          id: line._id,
+          item: line.item,
+          qty: line.qty,
+          displayItemName: line.displayItemName,
+          selections: selections.map((s) => ({
+            option: s.option,
+            choice: s.choice,
+            displayOptionName: s.displayOptionName,
+            displayChoiceName: s.displayChoiceName,
+          })),
+        });
+      }
+
+      results.push({
+        order: order._id,
+        user: order.user,
+        createdAt: order.createdAt,
+        lines: orderLines,
+      });
     }
-    // Queries return an array of dictionaries
-    return [{ status: existingOrder.status }];
+
+    return results;
   }
 }
