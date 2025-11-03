@@ -9,7 +9,7 @@ import { toFileUrl } from "jsr:@std/path/to-file-url";
 const flags = parseArgs(Deno.args, {
   string: ["port", "baseUrl"],
   default: {
-    port: "8000",
+    port: "8001",
     baseUrl: "/api",
   },
 });

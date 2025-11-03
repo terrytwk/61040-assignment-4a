@@ -236,4 +236,60 @@ export default class UserProfileConcept {
       return { error: `Failed to fetch profile: ${e.message}` };
     }
   }
+
+  /**
+   * _allProfiles () : (user: User, name: String, classYear: String?, major: String?, bio: String, favoriteDrink: String?, favoriteCafe: String?, avatar: Image?)[]
+   *
+   * requires true
+   *
+   * effects Returns all user profiles with their public fields. Optional fields are omitted if null/undefined.
+   */
+  async _allProfiles(): Promise<
+    {
+      user: User;
+      name: string;
+      classYear?: string;
+      major?: string;
+      bio: string;
+      favoriteDrink?: string;
+      favoriteCafe?: string;
+      avatar?: Image;
+    }[]
+  > {
+    const docs = await this.users.find({}).toArray();
+    return docs.map((profile) => {
+      const result: {
+        user: User;
+        name: string;
+        classYear?: string;
+        major?: string;
+        bio: string;
+        favoriteDrink?: string;
+        favoriteCafe?: string;
+        avatar?: Image;
+      } = {
+        user: profile._id,
+        name: profile.name,
+        bio: profile.bio,
+      };
+
+      if (profile.classYear !== undefined && profile.classYear !== null) {
+        result.classYear = profile.classYear;
+      }
+      if (profile.major !== undefined && profile.major !== null) {
+        result.major = profile.major;
+      }
+      if (profile.favoriteDrink !== undefined && profile.favoriteDrink !== null) {
+        result.favoriteDrink = profile.favoriteDrink;
+      }
+      if (profile.favoriteCafe !== undefined && profile.favoriteCafe !== null) {
+        result.favoriteCafe = profile.favoriteCafe;
+      }
+      if (profile.avatar !== undefined && profile.avatar !== null) {
+        result.avatar = profile.avatar;
+      }
+
+      return result;
+    });
+  }
 }

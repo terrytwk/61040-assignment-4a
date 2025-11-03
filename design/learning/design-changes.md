@@ -38,7 +38,7 @@ Here's a concept-by-concept summary of changes:
 6.  **UserProfile:**
     *   **State:** Simplified by removing `favoriteDrink`, `classYear`, `major`, `type`, `score`. Added `avatar`.
     *   **Actions:** `updateProfile` renamed to `setProfile`.
-    *   **Queries:** `_getProfile` renamed to `_profile`.
+    *   **Queries:** `_getProfile` renamed to `_profile`. Added `_allProfiles` to list all user profiles for community browsing (names, bio, optional class year/major, favorites, avatar).
 7.  **Option (v1) / Integration:**
     *   The incomplete `Option` concept from `v1` was removed as a standalone concept and its functionality was thoroughly integrated and expanded within the new, detailed `Menu` concept in the final version.
 8.  **New Concepts:**
