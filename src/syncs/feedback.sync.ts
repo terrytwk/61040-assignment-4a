@@ -1,10 +1,17 @@
-import { actions, Sync } from "@engine";
-import { Requesting, CustomerFeedback } from "@concepts";
+import { actions, Frames, Sync } from "@engine";
+import { Requesting, CustomerFeedback, Order } from "@concepts";
 
 export const CreateFeedbackRequest: Sync = ({ request, user, order, comment }) => ({
   when: actions(
     [Requesting.request, { path: "/CustomerFeedback/create", user, order, comment }, { request }],
   ),
+  where: async (frames) => {
+    const original = frames[0];
+    const orderId = original[order] as string;
+    const completed = await Order._byStatus({ status: "completed" });
+    const ok = completed.some((o) => o.order === orderId);
+    return ok ? new Frames(original) : new Frames();
+  },
   then: actions([CustomerFeedback.create, { user, order, comment }]),
 });
 

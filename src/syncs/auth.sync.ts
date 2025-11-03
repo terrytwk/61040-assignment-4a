@@ -1,4 +1,4 @@
-import { actions, Sync } from "@engine";
+import { actions, Frames, Sync } from "@engine";
 import { Requesting, UserAuthentication } from "@concepts";
 
 export const RegisterRequest: Sync = ({ request, username, password }) => ({
@@ -7,6 +7,14 @@ export const RegisterRequest: Sync = ({ request, username, password }) => ({
     { path: "/UserAuthentication/register", username, password },
     { request },
   ]),
+  where: async (frames) => {
+    const original = frames[0];
+    const matches = await UserAuthentication._searchByKerb({ kerbQuery: original[username] as string });
+    if (Array.isArray(matches) && matches.length === 0) {
+      return new Frames(original);
+    }
+    return new Frames();
+  },
   then: actions([UserAuthentication.register, { username, password }]),
 });
 

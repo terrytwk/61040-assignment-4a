@@ -1,4 +1,4 @@
-import { actions, Sync } from "@engine";
+import { actions, Frames, Sync } from "@engine";
 import { Requesting, Order } from "@concepts";
 
 export const OpenOrderRequest: Sync = ({ request, user }) => ({
@@ -60,6 +60,15 @@ export const SubmitOrderRequest: Sync = ({ request, order }) => ({
   when: actions(
     [Requesting.request, { path: "/Order/submit", order }, { request }],
   ),
+  where: async (frames) => {
+    const original = frames[0];
+    const orderId = original[order] as string;
+    const result = await Order._lines({ order: orderId });
+    if (Array.isArray(result) && result.length > 0) {
+      return new Frames(original);
+    }
+    return new Frames();
+  },
   then: actions([Order.submit, { order }]),
 });
 
