@@ -1,0 +1,36 @@
+# Project Reflection
+
+#### What was hard vs. easy
+- **Hard**: Switching contexts between the coding IDE and Obsidian when using the Context tool. It slowed feedback loops and introduced friction.
+- **Easier**: Once I built a VS Code extension to surface Context directly in the IDE, the workflow became much smoother and faster.
+- **Surprise**: The Context-driven workflow was often faster than using a coding agent for discovery and specification. However, an agentic tool like Cursor still felt easier for direct file edits and refactors.
+
+#### What went well
+- **End-to-end design-first flow**: After shifting to fully designing concepts before invoking LLMs, I could one-shot the backend with fewer iterations.
+- **Tooling leverage**: Integrating Context into VS Code reduced cognitive overhead and improved velocity.
+- **Clearer specs → better generations**: High-fidelity prompts/specs produced higher-quality, more consistent code.
+
+#### Mistakes and how I’d avoid them
+- **Mistake**: Creating concepts incrementally in the Context tool while still designing them led to churn, longer debugging, and rework.
+- **Fix**: Do complete concept design up front (data, behaviors, invariants, syncs). Then use the LLM to generate in one pass. Keep prompts grounded in finalized specs.
+- **Guardrails**: Freeze interfaces early, write acceptance tests/scenarios, and only then generate/iterate.
+
+#### Skills gained and next steps
+- **Gained**: System-level specification, prompt engineering for architecture, tighter IDE-tooling integration (VS Code extension), and faster iteration loops.
+- **To develop**: More rigorous property-based testing, stronger observability/telemetry for generated systems, and better prompt linting/checklists to reduce ambiguity.
+
+#### How I used the Context tool
+- **Early**: Used it for design+implementation simultaneously; this caused thrash.
+- **Later**: Used it as a single source of truth for finalized specifications. This enabled consistent, repeatable LLM outputs and simplified audits.
+- **Integration**: Bringing Context into VS Code removed the IDE↔Obsidian switching cost and made referencing specs nearly instant.
+
+#### How I used an agentic coding tool
+- **Cursor for direct edits**: Ideal for localized changes, refactors, and multi-file edits where immediate inline context matters.
+- **Complement to Context**: Cursor executed against the finalized design—fewer speculative edits, more deterministic changes.
+
+#### Conclusions on the role of LLMs in software development
+- **Design becomes the job**: Future software engineering will center on system design and unambiguous specifications more than hand-coding.
+- **LLMs as builders**: With precise specs, LLMs can one-shot robust backends. Engineers act more like architects; LLMs act like construction crews.
+- **Spec quality is everything**: The tighter and more explicit the spec/prompt, the better the outcome and the fewer iterations.
+- **Hybrid workflow**: Use Context (or similar) for canonical specs and traceability; use agentic editors for rapid, safe code application. This division of labor maximizes speed, quality, and maintainability.
+
