@@ -24,14 +24,7 @@
  * inclusions = {"route": "justification"}
  */
 
-export const inclusions: Record<string, string> = {
-  // Feel free to delete these example inclusions
-  "/api/LikertSurvey/_getSurveyQuestions": "this is a public query",
-  "/api/LikertSurvey/_getSurveyResponses": "responses are public",
-  "/api/LikertSurvey/_getRespondentAnswers": "answers are visible",
-  "/api/LikertSurvey/submitResponse": "allow anyone to submit response",
-  "/api/LikertSurvey/updateResponse": "allow anyone to update their response",
-};
+export const inclusions: Record<string, string> = {};
 
 /**
  * EXCLUSIONS
@@ -44,7 +37,15 @@ export const inclusions: Record<string, string> = {
  */
 
 export const exclusions: Array<string> = [
-  // Feel free to delete these example exclusions
-  "/api/LikertSurvey/createSurvey",
-  "/api/LikertSurvey/addQuestion",
+  "/api/UserAuthentication/register",
+  "/api/UserAuthentication/login",
+  "/api/UserAuthentication/changePassword",
+  "/api/Membership/activate",
+  "/api/Membership/deactivate",
+  "/api/Order/open",
+  "/api/Order/addItem",
+  "/api/Order/submit",
+  "/api/Order/complete",
+  "/api/CustomerFeedback/create",
+  "/api/UserProfile/setProfile",
 ];
